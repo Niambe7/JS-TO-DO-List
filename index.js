@@ -20,8 +20,8 @@ const todoList = [
 
     const ul = document.querySelector("ul")
     const afficherToDoList = ()=>{
-        const toDoNode = todoList.map((todo)=>{
-            return createToDoNode(todo)
+        const toDoNode = todoList.map((todo,index)=>{
+            return createToDoNode(todo,index)
         
         })
 
@@ -36,18 +36,26 @@ const todoList = [
         });
     }
 
-    const createToDoNode = (todo)=>{
+    const createToDoNode = (todo,index)=>{
 
-        const nodeElements = document.createElement("li");
-        nodeElements.innerHTML = `
-
+        const li = document.createElement("li");
+        const button = document.createElement("button");
+        button.innerHTML = 'Supprimer'
+        li.innerHTML = `
                 <span class ="todo ${todo.done ? 'done': ''}"></span>
                 <p>${todo.text}</p>
                 <button>Editer</button>
-                <button>Supprimer</button>
         `;
+        li.appendChild(button)
+        button.addEventListener("click",(event)=>{
+            supprimerTodo(index)
+        })
 
-        return nodeElements;
+        li.addEventListener("click", (event)=>{
+            toggleToDo(index);
+            afficherToDoList();
+        })
+        return li;
     }
 
     //console.log(createToDoNode(todoList));
@@ -67,7 +75,17 @@ const todoList = [
             done: false
         })
 
-        //console.log(todoList)
         event.target[0].value = "";
         afficherToDoList()
     })
+
+    const supprimerTodo = (index)=>{
+        todoList.splice(index,1);
+        afficherToDoList();
+        // console.log(todoList)
+        // console.log(index)
+    }
+
+    const toggleToDo = (index) =>{
+        todoList[index].done = !todoList[index].done
+    }
