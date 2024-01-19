@@ -3,25 +3,57 @@ const todoList = [
   {
     text: "Faire du sport",
     done: true,
+    editMode: true,
   },
 
   {
     text: "Cours Selma",
     done: false,
+    editMode: false,
   },
 
   {
     text: "Séance Cardio",
     done: true,
-  }
+    editMode: false,
+  },
 ];
 
     // Creer une fonction qui retourne la todoList
 
+     const createEditMode = (todo, index) => {
+       const li = document.createElement("li");
+       const input = document.createElement("input");
+       const btnCancel = document.createElement("button");
+       const btnSave = document.createElement("button");
+       input.type = "text";
+       input.value = todo.text;
+       btnCancel.innerHTML = "Cancel";
+       btnSave.innerHTML = "Save";
+
+       li.append(input, btnCancel, btnSave);
+       btnCancel.addEventListener("click", (event)=>{
+        event.stopPropagation();
+        cancelingEdition(index);
+       })
+
+       btnSave.addEventListener("click", (event)=>{
+        event.stopPropagation();
+        saveToDoEdition(index,input);
+       })
+       return li;
+     };
+
     const ul = document.querySelector("ul")
     const afficherToDoList = ()=>{
         const toDoNode = todoList.map((todo,index)=>{
-            return createToDoNode(todo,index)
+            if(todo.editMode){
+                return createEditMode(todo,index)
+            }
+
+            else{
+                 return createToDoNode(todo,index)
+            }
         
         })
 
@@ -39,22 +71,32 @@ const todoList = [
     const createToDoNode = (todo,index)=>{
 
         const li = document.createElement("li");
-        const button = document.createElement("button");
-        button.innerHTML = 'Supprimer'
+        const btnSupprimer = document.createElement("button");
+        const btnEdit = document.createElement("button");
+        btnSupprimer.innerHTML = 'Supprimer'
+        btnEdit.innerHTML = "Editer";
+
         li.innerHTML = `
                 <span class ="todo ${todo.done ? 'done': ''}"></span>
                 <p>${todo.text}</p>
-                <button>Editer</button>
         `;
-        li.appendChild(button)
-        button.addEventListener("click",(event)=>{
-            supprimerTodo(index)
-        })
+        btnSupprimer.addEventListener("click", (event) => {
+          event.stopPropagation();
+          supprimerTodo(index);
+        });
+
+        btnEdit.addEventListener("click", (event) => {
+          event.stopPropagation();
+          passToEditMode(index);
+        });
 
         li.addEventListener("click", (event)=>{
+            event.stopPropagation();
             toggleToDo(index);
             afficherToDoList();
         })
+
+        li.append(btnEdit, btnSupprimer);
         return li;
     }
 
@@ -75,7 +117,7 @@ const todoList = [
             done: false
         })
 
-        event.target[0].value = "";
+        event.target[0].value = ""; 
         afficherToDoList()
     })
 
@@ -89,3 +131,21 @@ const todoList = [
     const toggleToDo = (index) =>{
         todoList[index].done = !todoList[index].done
     }
+
+
+    const cancelingEdition = (index)=>{
+        todoList[index].editMode = false;
+        afficherToDoList();
+    }
+
+    const passToEditMode = (index)=>{
+        todoList[index].editMode = !todoList[index].editMode;
+        afficherToDoList();
+    }
+
+    const saveToDoEdition = (index,input)=>{
+        const value = input.value;
+        todoList[index].text = value;
+        todoList[index].editMode = false;
+        afficherToDoList()
+    };
